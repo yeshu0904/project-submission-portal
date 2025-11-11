@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Submissions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>All Project Submissions</h1>
+            <div class="header-actions">
+                <a href="{{ url_for('index') }}" class="back-btn">← Back to Submission</a>
+                <button id="deleteAllBtn" class="delete-all-btn" onclick="confirmDeleteAll()">🗑️ Delete All</button>
+            </div>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="submissions-list">
+            {% if submissions %}
+                {% for submission in submissions %}
+                <div class="submission-card" id="submission-{{ submission.id }}">
+                    <div class="submission-header">
+                        <h3>{{ submission.project_title }}</h3>
+                        <button class="delete-btn" onclick="confirmDelete({{ submission.id }})" title="Delete Submission">
+                            🗑️
+                        </button>
+                    </div>
+                    <div class="submission-details">
+                        <p><strong>Student:</strong> {{ submission.student_name }}</p>
+                        <p><strong>Email:</strong> {{ submission.email }}</p>
+                        <p><strong>Description:</strong> {{ submission.project_description }}</p>
+                        <p><strong>Submitted:</strong> {{ submission.submission_date }}</p>
+                        
+                        {% if submission.project_url %}
+                        <p><strong>Project URL:</strong> 
+                            <a href="{{ submission.project_url }}" target="_blank">View Project</a>
+                        </p>
+                        {% endif %}
+                        
+                        {% if submission.linkedin_url %}
+                        <p><strong>LinkedIn:</strong> 
+                            <a href="{{ submission.linkedin_url }}" target="_blank">View Profile</a>
+                        </p>
+                        {% endif %}
+                        
+                        {% if submission.filename %}
+                        <p><strong>File:</strong> 
+                            <a href="{{ url_for('download_file', filename=submission.filename) }}" download class="download-btn">
+                                📥 Download {{ submission.filename }}
+                            </a>
+                            {% if submission.filename.split('.')[-1].lower() in ['jpg', 'jpeg', 'png', 'gif', 'pdf'] %}
+                            <a href="{{ url_for('view_upload', filename=submission.filename) }}" target="_blank" class="view-btn">
+                                👁️ View File
+                            </a>
+                            {% endif %}
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-submissions">
+                    <p>No submissions yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Deletion</h3>
+            <p id="modalMessage">Are you sure you want to delete this submission?</p>
+            <div class="modal-actions">
+                <button id="confirmDeleteBtn" class="btn danger">Yes, Delete</button>
+                <button id="cancelDeleteBtn" class="btn secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
